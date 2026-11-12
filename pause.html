@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pause – a quiet corner to breathe</title>
+<meta name="description" content="A calm, ad-free space with soft music, breathing, gentle games and kind words. Nothing is saved or tracked.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#2a2150; --text:#fff7ee; --muted:#ddd3f2; --peach:#ffc4b0; --peach2:#ffd9cb;
+  --card:rgba(38,30,74,.66); --line:rgba(255,255,255,.22); --mint:#9be3c0;
+  --font:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Trebuchet MS",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font-family:var(--font);color:var(--text);background:#241f55;line-height:1.55;overflow-x:hidden;-webkit-text-size-adjust:100%}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--peach);outline-offset:3px}
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+
+/* header */
+header{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px}
+.logo{font-weight:700;font-size:1.35rem;text-shadow:0 1px 8px rgba(30,20,70,.55);display:flex;align-items:baseline;gap:8px}
+.logo small{font-weight:400;font-size:.8rem;opacity:.9}
+.ctrl{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.ctrl select{background:transparent;border:0;font-size:.85rem;padding:4px 2px}
+.ctrl select option{color:#222}
+.ctrl input[type=range]{width:72px;accent-color:var(--peach)}
+.ctrl label{font-size:.8rem;color:var(--muted)}
+@media(max-width:520px){.ctrl input[type=range]{width:54px}.logo small{display:none}}
+
+/* plus */
+.hr{display:flex;align-items:center;gap:8px}
+.plusb{border:0;border-radius:99px;padding:9px 14px;background:var(--peach);color:var(--ink);font-weight:700;font-size:.85rem}
+.plusb.on{background:var(--mint)}
+a.btn{text-decoration:none;text-align:center}
+.lock{font-size:.72rem;background:rgba(255,255,255,.18);border-radius:99px;padding:1px 8px;margin-left:6px;vertical-align:middle;font-weight:400}
+.price{font-size:2.2rem;font-weight:700;line-height:1.2}
+.price small{font-size:.95rem;font-weight:400;color:var(--muted)}
+.perks{list-style:none;padding:0;margin:12px 0 16px;display:grid;gap:8px}
+.perks li::before{content:"✓ ";color:var(--mint);font-weight:700}
+.code{width:100%;padding:12px 14px;border-radius:14px;border:1.5px solid var(--line);background:rgba(255,255,255,.1);margin:6px 0;letter-spacing:.08em;text-transform:uppercase}
+.code::placeholder{color:var(--muted);text-transform:none;letter-spacing:0}
+.msg{min-height:1.4em;font-size:.9rem;margin-bottom:8px;color:var(--peach2)}
+@media(max-width:420px){.ctrl input[type=range]{width:38px}.plusb{padding:8px 11px}}
+
+/* stage */
+main{position:relative;z-index:5;min-height:100%;display:flex;align-items:center;justify-content:center;padding:84px 16px 28px}
+.wrap{width:100%;max-width:660px}
+#view{animation:fade .5s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* guide */
+.guide{display:flex;align-items:flex-end;gap:10px;margin-bottom:14px}
+.spirit{width:96px;height:96px;flex:none;overflow:visible}
+.float{animation:bob 4.5s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-5px)}}
+.eyes ellipse.e{transform-box:fill-box;transform-origin:center;animation:blink 5s infinite}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+.bubble{position:relative;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px 18px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);margin-bottom:18px}
+.bubble::before{content:"";position:absolute;left:-8px;bottom:18px;width:14px;height:14px;background:inherit;border-left:1px solid var(--line);border-bottom:1px solid var(--line);transform:rotate(45deg)}
+.bubble:focus{outline:none}
+.bubble h1,.bubble h2{font-size:1.25rem;font-weight:700;line-height:1.35}
+.bubble p{color:var(--muted);font-size:.95rem;margin-top:4px}
+@media(max-width:520px){.spirit{width:76px;height:76px}.bubble h1,.bubble h2{font-size:1.1rem}}
+
+/* panel + options */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:18px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.dots{display:flex;gap:6px;margin-bottom:12px}
+.dots i{width:26px;height:5px;border-radius:9px;background:rgba(255,255,255,.22)}
+.dots i.on{background:var(--peach)}
+.opts{display:grid;gap:10px}
+.opt{display:flex;align-items:center;gap:12px;text-align:left;width:100%;padding:15px 16px;border-radius:16px;border:1.5px solid var(--line);background:rgba(255,255,255,.08);font-size:1.02rem;transition:background .15s,transform .15s}
+.opt:hover{background:rgba(255,255,255,.18)}
+.opt:active{transform:scale(.985)}
+.opt .em{font-size:1.45rem;width:1.8rem;text-align:center}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
+.chip{padding:9px 15px;border-radius:99px;border:1.5px solid var(--line);background:rgba(255,255,255,.08);font-size:.92rem}
+.chip[aria-pressed="true"]{background:var(--peach);color:var(--ink);border-color:var(--peach);font-weight:700}
+.lab{font-size:.9rem;color:var(--muted)}
+.btn{display:inline-block;border:0;border-radius:99px;padding:13px 26px;background:var(--peach);color:var(--ink);font-weight:700;font-size:1.02rem}
+.btn:hover{background:var(--peach2)}
+.btn.full{width:100%}
+.link{background:none;border:0;color:var(--muted);text-decoration:underline;font-size:.9rem;padding:8px 2px}
+
+/* hub */
+.pick{display:flex;gap:14px;align-items:center;width:100%;text-align:left;padding:18px;border-radius:20px;border:2px solid var(--peach);background:rgba(255,196,176,.14);margin-bottom:12px}
+.pick .em{font-size:2.2rem}
+.pick b{font-size:1.15rem;display:block}
+.pick span.d{color:var(--muted);font-size:.92rem}
+.badge{display:inline-block;background:var(--peach);color:var(--ink);font-weight:700;font-size:.75rem;border-radius:99px;padding:2px 10px;margin-bottom:4px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.tile{padding:14px;border-radius:16px;border:1.5px solid var(--line);background:rgba(255,255,255,.08);text-align:left}
+.tile:hover{background:rgba(255,255,255,.18)}
+.tile .em{font-size:1.6rem;display:block}
+.tile b{display:block;font-size:.98rem;margin-top:2px}
+.tile span.d{color:var(--muted);font-size:.82rem;line-height:1.3;display:block}
+
+/* activity */
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.top h2{font-size:1.15rem}
+.back{border:1.5px solid var(--line);background:rgba(255,255,255,.08);border-radius:99px;padding:7px 14px;font-size:.9rem}
+.stagebox{position:relative;border-radius:20px;overflow:hidden;min-height:340px;background:rgba(20,14,50,.45);border:1px solid var(--line)}
+.hint{text-align:center;color:var(--muted);font-size:.9rem;margin-top:12px}
+
+.orbwrap{display:grid;place-items:center;height:340px}
+.orb{width:230px;height:230px;border-radius:50%;display:grid;place-items:center;text-align:center;font-weight:700;font-size:1.1rem;color:var(--ink);
+  background:radial-gradient(circle at 35% 30%,#fff 0,#ffe3ee 30%,#ffb8d0 70%,#e9a0ff 100%);box-shadow:0 0 60px 10px rgba(255,190,220,.45);
+  transition-property:transform;transition-timing-function:ease-in-out}
+
+.bub{position:absolute;bottom:-110px;border:0;border-radius:50%;padding:0;
+  background:radial-gradient(circle at 30% 28%,rgba(255,255,255,.95) 0,rgba(255,255,255,.35) 22%,rgba(160,220,255,.28) 60%,rgba(255,190,230,.35) 100%);
+  box-shadow:inset 0 0 10px rgba(255,255,255,.6),0 0 14px rgba(190,220,255,.35);animation:rise linear forwards}
+@keyframes rise{to{transform:translateY(-560px)}}
+.bub.pop{animation:popit .22s ease-out forwards!important}
+@keyframes popit{to{transform:scale(1.5);opacity:0}}
+
+.kindbox{display:grid;place-items:center;min-height:260px;padding:26px;text-align:center}
+.kindbox p{font-size:1.3rem;line-height:1.5;max-width:30ch}
+.colcv{display:block;width:100%;height:340px;touch-action:none}
+
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px}
+.card{aspect-ratio:1/1;border-radius:16px;border:1.5px solid var(--line);background:rgba(255,255,255,.1);font-size:2rem;display:grid;place-items:center;transition:transform .25s,background .25s}
+.card.up{background:var(--peach2);transform:rotateY(0)}
+.card.done{background:rgba(155,227,192,.35);opacity:.8}
+.card span{opacity:0;transition:opacity .2s}
+.card.up span,.card.done span{opacity:1}
+
+.foot{margin-top:16px;text-align:center;font-size:.78rem;color:var(--muted);line-height:1.5;text-shadow:0 1px 6px rgba(20,10,50,.6)}
+.foot b{color:var(--text)}
+
+@media (prefers-reduced-motion: reduce){
+  .float,.eyes ellipse.e,#view{animation:none!important}
+  .bub{animation-duration:30s!important}
+}
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<header>
+  <div class="logo">Pause <small>ひといき</small></div>
+  <div class="hr"><button class="plusb" id="plusb">Plus</button>
+  <div class="ctrl">
+    <label for="snd" class="sr">Sound</label>
+    <select id="snd" aria-label="Sound type">
+      <option value="music">Soft music</option>
+      <option value="nature">Nature sounds</option>
+      <option value="off">Silent</option>
+    </select>
+    <input id="vol" type="range" min="0" max="100" value="55" aria-label="Volume">
+  </div></div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div id="view"></div>
+    <p class="foot">Nothing you choose here is sent anywhere. If you unlock Plus, it is remembered only on your own device.<br>
+      Pause is a quiet space, not a replacement for real help. If you're struggling badly, please talk to someone you trust. In India, <b>Tele-MANAS</b> is free to call at <b>14416</b>.</p>
+  </div>
+</main>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* =============== SOUND ENGINE (made from code, no songs) =============== */
+const Snd = (() => {
+  let ctx = null, master = null, conv = null, bus = null, timers = [], srcs = [], on = false, mode = "music", cur = null, idx = 0, vol = .55;
+  const midi = m => 440 * Math.pow(2, (m - 69) / 12);
+  const SETS = {
+    stressed:{len:10,bMin:3,bMax:7,bVol:.05,pad:.04,chords:[[45,52,57,60],[41,48,53,57],[48,55,60,64],[43,50,55,59]],bells:[69,72,74,76,79],nature:"water"},
+    tired:{len:11,bMin:5,bMax:10,bVol:.04,pad:.045,chords:[[50,57,62,66],[47,54,59,62],[43,50,55,59],[45,52,57,61]],bells:[74,76,78,81,83],nature:"wind"},
+    restless:{len:8,bMin:1.5,bMax:4,bVol:.05,pad:.035,chords:[[48,55,60,64],[53,57,60,64],[43,50,55,59],[52,55,59,64]],bells:[72,74,76,79,81,84],nature:"birds"},
+    happy:{len:7,bMin:1.2,bMax:3.5,bVol:.055,pad:.035,chords:[[43,50,55,59],[48,55,60,64],[40,47,52,55],[38,45,50,54]],bells:[79,81,83,86,88],nature:"birds"},
+    sad:{len:10,bMin:4,bMax:8,bVol:.045,pad:.04,chords:[[50,57,62,65],[46,53,58,62],[41,48,53,57],[48,55,60,64]],bells:[74,77,79,81,84],nature:"rain"}
+  };
+  function ensure(){
+    if (ctx) return;
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    master = ctx.createGain(); master.gain.value = vol * .55; master.connect(ctx.destination);
+    conv = ctx.createConvolver();
+    const r = ctx.sampleRate, l = r * 3.2, b = ctx.createBuffer(2, l, r);
+    for (let c = 0; c < 2; c++) { const d = b.getChannelData(c); for (let i = 0; i < l; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / l, 2.5); }
+    conv.buffer = b;
+    const wet = ctx.createGain(); wet.gain.value = .7; conv.connect(wet); wet.connect(master);
+  }
+  function newBus(){
+    bus = ctx.createGain(); bus.gain.value = 0;
+    bus.connect(master); bus.connect(conv);
+    bus.gain.setTargetAtTime(1, ctx.currentTime, .6);
+  }
+  function chord(notes, len){
+    const t = ctx.currentTime + .05, set = cur, b = bus;
+    notes.forEach((n, i) => [-4, 6].forEach(det => {
+      const o = ctx.createOscillator(), g = ctx.createGain(), f = ctx.createBiquadFilter();
+      o.type = i % 2 ? "triangle" : "sine"; o.frequency.value = midi(n); o.detune.value = det;
+      f.type = "lowpass"; f.frequency.value = 900;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(set.pad, t + len * .45); g.gain.linearRampToValueAtTime(0, t + len + 2.5);
+      o.connect(f); f.connect(g); g.connect(b); o.start(t); o.stop(t + len + 2.6);
+    }));
+  }
+  function bell(freq, v){
+    const t = ctx.currentTime + .02, b = bus;
+    [[1,1],[2.01,.25],[3.5,.08]].forEach(([m, a]) => {
+      const o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sine"; o.frequency.value = freq * m;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v * a, t + .01); g.gain.exponentialRampToValueAtTime(.0001, t + 3.2);
+      o.connect(g); g.connect(b); o.start(t); o.stop(t + 3.3);
+    });
+  }
+  function loop(){
+    if (!on || mode !== "music") return;
+    const set = cur; chord(set.chords[idx++ % set.chords.length], set.len);
+    let tt = 1 + Math.random() * set.bMin;
+    while (tt < set.len) {
+      const f = midi(set.bells[Math.random() * set.bells.length | 0]);
+      timers.push(setTimeout(() => { if (on) bell(f, set.bVol); }, tt * 1000));
+      tt += set.bMin + Math.random() * (set.bMax - set.bMin);
+    }
+    timers.push(setTimeout(loop, set.len * 1000));
+  }
+  function noise(white){
+    const l = ctx.sampleRate * 3, b = ctx.createBuffer(1, l, ctx.sampleRate), d = b.getChannelData(0); let last = 0;
+    for (let i = 0; i < l; i++) { const w = Math.random() * 2 - 1; if (white) d[i] = w; else { last = (last + .02 * w) / 1.02; d[i] = last * 3.5; } }
+    const s = ctx.createBufferSource(); s.buffer = b; s.loop = true; return s;
+  }
+  function lfo(param, rate, depth){
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = rate; g.gain.value = depth;
+    o.connect(g); g.connect(param); o.start(); srcs.push(o);
+  }
+  function bed(kind, level){
+    const g = ctx.createGain(), s = noise(kind === "rain"), f = ctx.createBiquadFilter(); srcs.push(s);
+    if (kind === "rain") { f.type = "highpass"; f.frequency.value = 900; const f2 = ctx.createBiquadFilter(); f2.type = "lowpass"; f2.frequency.value = 7000; s.connect(f); f.connect(f2); f2.connect(g); g.gain.value = .05 * level; }
+    else if (kind === "water") { f.type = "lowpass"; f.frequency.value = 700; s.connect(f); f.connect(g); g.gain.value = .05 * level; lfo(g.gain, .15, .02 * level); }
+    else { f.type = "bandpass"; f.frequency.value = 400; f.Q.value = .6; s.connect(f); f.connect(g); g.gain.value = .04 * level; lfo(g.gain, .07, .025 * level); }
+    g.connect(bus); s.start();
+  }
+  function chirp(){
+    const t = ctx.currentTime + .02, o = ctx.createOscillator(), g = ctx.createGain(), f0 = 2200 + Math.random() * 1200;
+    o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f0 * 1.35, t + .09); o.frequency.exponentialRampToValueAtTime(f0 * .9, t + .18);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.025, t + .03); g.gain.exponentialRampToValueAtTime(.0001, t + .22);
+    o.connect(g); g.connect(bus); o.start(t); o.stop(t + .25);
+  }
+  function chirps(){
+    if (!on) return;
+    const n = 1 + (Math.random() * 3 | 0);
+    for (let i = 0; i < n; i++) timers.push(setTimeout(() => { if (on) chirp(); }, i * 230));
+    timers.push(setTimeout(chirps, 4000 + Math.random() * 7000));
+  }
+  function stop(){
+    if (!ctx) return;
+    on = false;
+    const s = srcs, t = timers, old = bus; srcs = []; timers = [];
+    t.forEach(clearTimeout);
+    if (old) { old.gain.setTargetAtTime(0, ctx.currentTime, .25); setTimeout(() => { s.forEach(n => { try { n.stop(); } catch (e) {} }); try { old.disconnect(); } catch (e) {} }, 1500); }
+  }
+  function start(moodKey, m){
+    ensure(); if (ctx.state === "suspended") ctx.resume();
+    stop(); newBus();
+    cur = SETS[moodKey] || SETS.stressed; mode = m; on = true; idx = 0;
+    if (m === "music") { loop(); if (moodKey === "sad") bed("rain", .5); }
+    else { bed(cur.nature === "birds" ? "wind" : cur.nature, cur.nature === "birds" ? .6 : 1); if (cur.nature === "birds") chirps(); }
+  }
+  function setVol(v){ vol = v; if (master) master.gain.setTargetAtTime(v * .55, ctx.currentTime, .1); }
+  function blip(){
+    if (!ctx || !on) return;
+    const t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain();
+    o.frequency.setValueAtTime(700, t); o.frequency.exponentialRampToValueAtTime(220, t + .09);
+    g.gain.setValueAtTime(.09, t); g.gain.exponentialRampToValueAtTime(.0001, t + .12);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + .14);
+  }
+  return { start, stop, setVol, blip };
+})();
+
+/* =============== BACKGROUND SCENE =============== */
+const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const SCENES = {
+  calm:    { top:hex("#241f55"), mid:hex("#5b4a9c"), bot:hex("#f2a7b8"), stars:1,  moon:1,  lantern:1,  rain:0 },
+  tired:   { top:hex("#3b2a5c"), mid:hex("#a2557a"), bot:hex("#ffbf8f"), stars:.45,moon:.9, lantern:1,  rain:0 },
+  restless:{ top:hex("#6fa6e0"), mid:hex("#b9d3f2"), bot:hex("#ffe3d1"), stars:0,  moon:.4, lantern:.25,rain:0 },
+  happy:   { top:hex("#86c3ee"), mid:hex("#ffd1dc"), bot:hex("#fff0c2"), stars:0,  moon:.3, lantern:.2, rain:0 },
+  sad:     { top:hex("#273049"), mid:hex("#4c5d7c"), bot:hex("#8fa3b8"), stars:.15,moon:.35,lantern:.5, rain:1 }
+};
+let scene = "calm";
+const cur = JSON.parse(JSON.stringify(SCENES.calm));
+const cv = $("#bg"), c = cv.getContext("2d");
+let W, H, stars = [], petals = [], lanterns = [], drops = [];
+const rnd = (a, b) => a + Math.random() * (b - a);
+
+function build(){
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  stars = Array.from({ length: 80 }, () => ({ x: Math.random(), y: Math.random() * .55, r: rnd(.6, 1.7), ph: Math.random() * 6 }));
+  const np = W < 600 ? 22 : 44;
+  petals = Array.from({ length: np }, () => ({ x: rnd(0, W), y: rnd(-H, H), r: rnd(5, 9), vy: rnd(14, 34), vx: rnd(-8, 8), rot: rnd(0, 6), vr: rnd(-.8, .8), sw: rnd(10, 30), ph: rnd(0, 6), t: Math.random() }));
+  lanterns = Array.from({ length: 6 }, () => ({ x: rnd(.05, .95) * W, y: rnd(.2, 1) * H, s: rnd(11, 20), sp: rnd(6, 12), ph: rnd(0, 6) }));
+  drops = Array.from({ length: 130 }, () => ({ x: rnd(0, W), y: rnd(0, H), l: rnd(10, 22), v: rnd(500, 800) }));
+}
+const mix = (a, b, f) => a.map((v, i) => v + (b[i] - v) * f);
+const rgb = (a, al = 1) => `rgba(${a[0] | 0},${a[1] | 0},${a[2] | 0},${al})`;
+const DARK = [28, 22, 64];
+
+function mountains(base, amp, col, seed){
+  c.beginPath(); c.moveTo(0, H);
+  for (let x = 0; x <= W; x += 8) {
+    const y = base + Math.sin(x * .004 + seed) * amp + Math.sin(x * .011 + seed * 2.3) * amp * .45;
+    c.lineTo(x, y);
+  }
+  c.lineTo(W, H); c.closePath(); c.fillStyle = col; c.fill();
+}
+
+let last = performance.now();
+function frame(now){
+  const dt = Math.min((now - last) / 1000, .05); last = now;
+  const sp = REDUCE ? 0 : 1, T = SCENES[scene], k = .04;
+  ["top", "mid", "bot"].forEach(n => { cur[n] = mix(cur[n], T[n], k); });
+  ["stars", "moon", "lantern", "rain"].forEach(n => { cur[n] += (T[n] - cur[n]) * k; });
+
+  const g = c.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, rgb(cur.top)); g.addColorStop(.55, rgb(cur.mid)); g.addColorStop(1, rgb(cur.bot));
+  c.fillStyle = g; c.fillRect(0, 0, W, H);
+
+  if (cur.stars > .02) stars.forEach(s => {
+    const a = cur.stars * (.5 + .5 * Math.sin(now / 900 * sp + s.ph));
+    c.fillStyle = `rgba(255,248,230,${a})`; c.beginPath(); c.arc(s.x * W, s.y * H, s.r, 0, 6.3); c.fill();
+  });
+
+  const mr = Math.min(W, H) * .085, mx = W * .76, my = H * .2;
+  const glow = c.createRadialGradient(mx, my, mr * .6, mx, my, mr * 4);
+  glow.addColorStop(0, `rgba(255,243,214,${.35 * cur.moon})`); glow.addColorStop(1, "rgba(255,243,214,0)");
+  c.fillStyle = glow; c.fillRect(mx - mr * 4, my - mr * 4, mr * 8, mr * 8);
+  c.fillStyle = `rgba(255,246,222,${.95 * cur.moon})`; c.beginPath(); c.arc(mx, my, mr, 0, 6.3); c.fill();
+
+  mountains(H * .74, H * .05, rgb(mix(cur.mid, DARK, .4), .85), 1.3);
+
+  lanterns.forEach(l => {
+    l.y -= l.sp * dt * sp; if (l.y < -40) { l.y = H + 40; l.x = rnd(.05, .95) * W; }
+    const x = l.x + Math.sin(now / 1800 * sp + l.ph) * 14, a = cur.lantern;
+    if (a < .03) return;
+    const gl = c.createRadialGradient(x, l.y, 0, x, l.y, l.s * 3.2);
+    gl.addColorStop(0, `rgba(255,196,120,${.5 * a})`); gl.addColorStop(1, "rgba(255,196,120,0)");
+    c.fillStyle = gl; c.fillRect(x - l.s * 3.2, l.y - l.s * 3.2, l.s * 6.4, l.s * 6.4);
+    c.fillStyle = `rgba(255,176,96,${.95 * a})`; c.beginPath(); c.roundRect(x - l.s * .42, l.y - l.s * .55, l.s * .84, l.s * 1.1, 5); c.fill();
+    c.fillStyle = `rgba(90,40,50,${.8 * a})`; c.fillRect(x - l.s * .3, l.y - l.s * .62, l.s * .6, 3); c.fillRect(x - l.s * .3, l.y + l.s * .55, l.s * .6, 3);
+  });
+
+  mountains(H * .85, H * .045, rgb(mix(cur.mid, DARK, .72)), 4.1);
+
+  const slow = 1 - cur.rain * .5;
+  petals.forEach(p => {
+    p.y += p.vy * dt * sp * slow; p.ph += dt * sp;
+    p.x += (p.vx + Math.sin(p.ph) * p.sw) * dt * sp; p.rot += p.vr * dt * sp;
+    if (p.y > H + 20) { p.y = -20; p.x = rnd(0, W); }
+    if (p.x > W + 20) p.x = -20; if (p.x < -20) p.x = W + 20;
+    c.save(); c.translate(p.x, p.y); c.rotate(p.rot);
+    c.fillStyle = `rgba(255,${200 + p.t * 30 | 0},${222 + p.t * 20 | 0},${.5 + p.t * .35})`;
+    c.beginPath(); c.moveTo(0, -p.r); c.bezierCurveTo(p.r * .9, -p.r * .6, p.r * .8, p.r * .5, 0, p.r); c.bezierCurveTo(-p.r * .8, p.r * .5, -p.r * .9, -p.r * .6, 0, -p.r); c.fill(); c.restore();
+  });
+
+  if (cur.rain > .03) {
+    c.strokeStyle = `rgba(200,220,255,${.35 * cur.rain})`; c.lineWidth = 1; c.beginPath();
+    drops.forEach(d => {
+      d.y += d.v * dt * sp; d.x -= d.v * .12 * dt * sp;
+      if (d.y > H) { d.y = -20; d.x = rnd(0, W + 100); }
+      c.moveTo(d.x, d.y); c.lineTo(d.x + d.l * .12, d.y - d.l);
+    });
+    c.stroke();
+  }
+  requestAnimationFrame(frame);
+}
+addEventListener("resize", build);
+build(); requestAnimationFrame(frame);
+
+/* =============== APP =============== */
+const S = { mood: null, energy: null, need: null, sound: "music", started: false, cleanup: null };
+const MOOD_SCENE = { stressed: "calm", tired: "tired", restless: "restless", happy: "happy", sad: "sad" };
+const view = $("#view");
+
+const spirit = `
+<svg class="spirit" viewBox="0 0 120 120" aria-hidden="true">
+  <ellipse cx="60" cy="110" rx="30" ry="5" fill="rgba(20,10,50,.3)"/>
+  <g class="float">
+    <path d="M60 22C92 22 104 52 102 78 100 100 82 106 60 106 38 106 20 100 18 78 16 52 28 22 60 22Z" fill="#fff6ec"/>
+    <path d="M60 24C58 10 70 5 80 10 76 21 68 25 60 24Z" fill="#9be3c0"/>
+    <g class="eyes">
+      <ellipse class="e" cx="46" cy="64" rx="5" ry="7" fill="#2a2150"/>
+      <ellipse class="e" cx="74" cy="64" rx="5" ry="7" fill="#2a2150"/>
+      <circle cx="44.4" cy="61.4" r="1.8" fill="#fff"/><circle cx="72.4" cy="61.4" r="1.8" fill="#fff"/>
+    </g>
+    <ellipse cx="35" cy="76" rx="7" ry="4.5" fill="#ffb3c6" opacity=".85"/>
+    <ellipse cx="85" cy="76" rx="7" ry="4.5" fill="#ffb3c6" opacity=".85"/>
+    <path d="M54 77Q60 84 66 77" stroke="#2a2150" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  </g>
+</svg>`;
+
+const guide = (title, sub, h = "h2") => `
+<div class="guide">${spirit}
+  <div class="bubble" tabindex="-1" id="say"><${h}>${title}</${h}>${sub ? `<p>${sub}</p>` : ""}</div>
+</div>`;
+
+function go(html){
+  if (S.cleanup) { S.cleanup(); S.cleanup = null; }
+  view.style.animation = "none"; view.offsetHeight; view.style.animation = "";
+  view.innerHTML = html;
+  const say = $("#say"); if (say) say.focus({ preventScroll: true });
+  window.scrollTo({ top: 0 });
+}
+
+function setScene(mood){ scene = MOOD_SCENE[mood] || "calm"; }
+
+/* --- intro --- */
+function intro(){
+  scene = "calm";
+  go(`${guide("Take a minute. You've been carrying a lot.", "Three small questions, then I'll find something gentle for you.", "h1")}
+  <div class="panel">
+    <div class="lab">What would you like to hear?</div>
+    <div class="chips" role="group" aria-label="Sound choice">
+      ${[["music", "Soft music"], ["nature", "Nature sounds"], ["off", "Silent"]].map(([k, t]) => `<button class="chip" data-sound="${k}" aria-pressed="${S.sound === k}">${t}</button>`).join("")}
+    </div>
+    <button class="btn full" data-act="ask1">Begin</button>
+  </div>`);
+}
+
+/* --- questions --- */
+const Q = [
+  { key: "mood", say: "How are you feeling right now?", opts: [["stressed", "😣", "Stressed or heavy"], ["tired", "😴", "Tired"], ["restless", "🌀", "Restless"], ["happy", "🙂", "Okay, even good"], ["sad", "🌧️", "Sad or low"]] },
+  { key: "energy", say: "How much energy do you have?", opts: [["little", "🕯️", "Very little"], ["some", "🌙", "A little"], ["plenty", "☀️", "Quite a lot"]] },
+  { key: "need", say: "What do you need most?", opts: [["quiet", "🍃", "Quiet"], ["smile", "💌", "A smile"], ["distract", "🎐", "A gentle distraction"]] }
+];
+function ask(n){
+  const q = Q[n];
+  go(`${guide(q.say, n === 2 ? "Tap one and I'll start the music." : "")}
+  <div class="panel">
+    <div class="dots">${Q.map((_, i) => `<i class="${i <= n ? "on" : ""}"></i>`).join("")}</div>
+    <div class="opts">${q.opts.map(([v, e, t]) => `<button class="opt" data-q="${n}" data-v="${v}"><span class="em" aria-hidden="true">${e}</span>${t}</button>`).join("")}</div>
+    ${n > 0 ? `<button class="link" data-act="ask${n - 1}">Back</button>` : ""}
+  </div>`);
+}
+
+/* --- hub --- */
+const ACT = {
+  breathe: { t: "Breathing bubble", d: "Breathe in and out with the glow.", e: "🌬️" },
+  pop: { t: "Pop the bubbles", d: "No score. Just soft pops.", e: "🫧" },
+  kind: { t: "Kind words", d: "A gentle question or thought.", e: "💌" },
+  colors: { t: "Slow colours", d: "Touch the screen to paint soft light.", e: "🎨" },
+  pairs: { t: "Match the pairs", d: "Flip cards. No timer, no score.", e: "🌸" }
+};
+const GREET = {
+  stressed: "That sounds like a lot. Let's slow everything down together, one breath at a time.",
+  tired: "You've been going for a long time. Nothing is needed from you here. Rest as much as you like.",
+  restless: "A busy mind? That's okay. Let's give your hands and eyes something soft to do.",
+  happy: "I'm glad you're doing okay. Let's keep it light and enjoy a little play.",
+  sad: "I'm sorry it feels heavy today. You don't have to fix anything. I'll stay right here with you."
+};
+function pick(){
+  const r = pick0();
+  return (PLUS_ACT.includes(r) && !isPlus()) ? (S.need === "distract" ? "pop" : "breathe") : r;
+}
+function pick0(){
+  if (!S.mood || S.mood === "stressed") return "breathe";
+  if (S.need === "quiet") return S.energy === "plenty" ? "colors" : "breathe";
+  if (S.need === "smile") return (S.mood === "sad" || S.energy === "little") ? "kind" : "pop";
+  return S.energy === "little" ? "pop" : "pairs";
+}
+function hub(first){
+  const p = pick();
+  go(`${guide(first ? GREET[S.mood] : "Choose anything. There's no wrong choice.", first ? "I picked something for you, but you can try any of them." : "")}
+  <div class="panel">
+    <button class="pick" data-act="${p}"><span class="em" aria-hidden="true">${ACT[p].e}</span><span><span class="badge">Picked for you</span><b>${ACT[p].t}</b><span class="d">${ACT[p].d}</span></span></button>
+    <div class="grid">${Object.keys(ACT).filter(k => k !== p).map(k => `<button class="tile" data-act="${k}"><span class="em" aria-hidden="true">${ACT[k].e}</span><b>${ACT[k].t}${PLUS_ACT.includes(k) && !isPlus() ? `<span class="lock">🔒 Plus</span>` : ""}</b><span class="d">${ACT[k].d}</span></button>`).join("")}</div>
+    <button class="link" data-act="redo">Change how I feel</button>
+  </div>`);
+}
+
+/* --- activity shell --- */
+function activity(key, inner, hint){
+  go(`<div class="panel">
+    <div class="top"><button class="back" data-act="hub">← Back</button><h2>${ACT[key].t}</h2></div>
+    <div class="stagebox" id="box">${inner || ""}</div>
+    ${hint ? `<p class="hint">${hint}</p>` : ""}
+  </div>`);
+  return $("#box");
+}
+
+/* breathing */
+function breathe(){
+  const box = activity("breathe", `<div class="orbwrap"><div class="orb" id="orb"><span id="otx">Get comfortable</span></div></div>`, "In for 4, hold, out for 6. Go at your own pace.");
+  const orb = $("#orb", box), tx = $("#otx", box); let dead = false, t;
+  orb.style.transform = "scale(.62)";
+  const phase = (txt, sc, sec, next, wait) => { if (dead) return; tx.textContent = txt; orb.style.transitionDuration = sec + "s"; orb.style.transform = `scale(${sc})`; t = setTimeout(next, wait * 1000); };
+  const inh = () => phase("Breathe in", 1, 4, hold, 4);
+  const hold = () => phase("Hold gently", 1, 1, exh, 1.5);
+  const exh = () => phase("Breathe out", .62, 6, inh, 6);
+  t = setTimeout(inh, 1500);
+  S.cleanup = () => { dead = true; clearTimeout(t); };
+}
+
+/* pop bubbles */
+function pop(){
+  const box = activity("pop", "", "Tap a bubble. There's nothing to win.");
+  box.style.height = "400px";
+  let live = 0, dead = false, t;
+  function spawn(){
+    if (dead) return;
+    if (live < 12) {
+      const s = rnd(44, 96), b = document.createElement("button");
+      b.className = "bub"; b.setAttribute("aria-label", "Bubble"); b.style.width = b.style.height = s + "px";
+      b.style.left = rnd(2, 92) + "%"; b.style.animationDuration = rnd(8, 14) + "s"; live++;
+      const kill = () => { if (b.isConnected) { b.remove(); live--; } };
+      b.addEventListener("animationend", e => { if (e.animationName === "rise") kill(); });
+      b.addEventListener("pointerdown", e => { e.preventDefault(); if (b.classList.contains("pop")) return; Snd.blip(); b.classList.add("pop"); setTimeout(kill, 230); });
+      box.appendChild(b);
+    }
+    t = setTimeout(spawn, rnd(500, 900));
+  }
+  for (let i = 0; i < 4; i++) setTimeout(spawn, i * 200);
+  S.cleanup = () => { dead = true; clearTimeout(t); };
+}
+
+/* kind words */
+const KIND = shuffle([
+  "What is one small thing that made you smile today?", "What is a sound that makes you feel calm?",
+  "Who are you grateful for, and why?", "What is something kind you did for someone recently?",
+  "If you could rest anywhere right now, where would it be?", "What is a favourite smell from your childhood?",
+  "What is one thing your body did well for you today?", "What would you tell a friend who felt the way you do now?",
+  "You don't have to be productive to be worthy.", "Drink some water. Unclench your shoulders. Soften your jaw.",
+  "Slow days are still days that count.", "Whatever you're carrying, you can put it down for one minute.",
+  "You are allowed to rest without earning it.", "Small steps are still steps.",
+  "Being tired doesn't mean you're failing. It means you've been trying.", "It's okay to take things one hour at a time."
+]);
+let ki = 0;
+function kind(){
+  const box = activity("kind", `<div class="kindbox"><p id="kp">${KIND[ki % KIND.length]}</p></div>`);
+  const btn = document.createElement("div"); btn.style.cssText = "text-align:center;margin-top:14px";
+  btn.innerHTML = `<button class="btn" id="nk">Another one</button>`; box.parentNode.appendChild(btn);
+  $("#nk").onclick = () => { ki++; $("#kp").textContent = KIND[ki % KIND.length]; };
+}
+
+/* slow colours */
+function colors(){
+  const box = activity("colors", `<canvas class="colcv" id="cc"></canvas>`, "Touch or move across the screen. Let it drift.");
+  const cc = $("#cc", box), x = cc.getContext("2d"); let w, h, hue = 260, blobs = [], dead = false, raf, auto = 0;
+  const fit = () => { const dpr = Math.min(devicePixelRatio || 1, 2); w = cc.clientWidth; h = cc.clientHeight; cc.width = w * dpr; cc.height = h * dpr; x.setTransform(dpr, 0, 0, dpr, 0, 0); x.fillStyle = "#1a1440"; x.fillRect(0, 0, w, h); };
+  fit();
+  const add = (px, py) => blobs.push({ x: px, y: py, r: 4, max: rnd(50, 110), hue: hue, a: .5 });
+  const at = e => { const r = cc.getBoundingClientRect(); add(e.clientX - r.left, e.clientY - r.top); };
+  cc.addEventListener("pointerdown", at); cc.addEventListener("pointermove", e => { if (e.buttons || e.pointerType === "touch") at(e); });
+  function loop(now){
+    if (dead) return;
+    x.fillStyle = "rgba(26,20,64,.07)"; x.fillRect(0, 0, w, h);
+    if (now - auto > 800) { auto = now; add(rnd(0, w), rnd(0, h)); }
+    hue = (hue + .25) % 360;
+    blobs.forEach(b => {
+      b.r += (b.max - b.r) * .02; b.a *= .985;
+      const g = x.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
+      g.addColorStop(0, `hsla(${b.hue},85%,78%,${b.a})`); g.addColorStop(1, `hsla(${b.hue + 30},85%,70%,0)`);
+      x.fillStyle = g; x.fillRect(b.x - b.r, b.y - b.r, b.r * 2, b.r * 2);
+    });
+    blobs = blobs.filter(b => b.a > .02);
+    raf = requestAnimationFrame(loop);
+  }
+  raf = requestAnimationFrame(loop);
+  S.cleanup = () => { dead = true; cancelAnimationFrame(raf); };
+}
+
+/* match pairs */
+function pairs(){
+  const deck = shuffle(["🌸", "🌙", "⭐", "🍃", "🏮", "🐚"].flatMap(e => [e, e]));
+  const box = activity("pairs", `<div class="cards">${deck.map((e, i) => `<button class="card" data-i="${i}" aria-label="Card"><span>${e}</span></button>`).join("")}</div>`, "Find the matching pairs. Take all the time you like.");
+  let open = [], lock = false, found = 0, dead = false;
+  const hint = $(".hint");
+  box.addEventListener("click", ev => {
+    const b = ev.target.closest(".card"); if (!b || lock || b.classList.contains("up") || b.classList.contains("done")) return;
+    b.classList.add("up"); Snd.blip(); open.push(b);
+    if (open.length === 2) {
+      const [a, d] = open;
+      if (deck[a.dataset.i] === deck[d.dataset.i]) {
+        a.classList.replace("up", "done"); d.classList.replace("up", "done"); open = []; found++;
+        if (found === 6) hint.innerHTML = `Lovely. Take another slow breath. <button class="link" data-act="pairs">Play again</button>`;
+      } else { lock = true; setTimeout(() => { if (dead) return; a.classList.remove("up"); d.classList.remove("up"); open = []; lock = false; }, 900); }
+    }
+  });
+  S.cleanup = () => { dead = true; };
+}
+
+/* =============== PAUSE PLUS (₹30 for 2 months) =============== */
+const PLUS = {
+  price: 30,
+  days: 60,
+  phone: "7593067709",         // customers pay this number on any UPI app
+  upiId: "",                   // optional: add your UPI ID (like name@bank) to show an "Open UPI app" button
+  whatsapp: "917593067709",    // same number with country code, no + or spaces
+  // 40 access codes, stored as scrambled hashes so nobody can read them here.
+  // Your real codes are in pause-codes-PRIVATE.txt (never upload that file).
+  codes: ["aqdsdamnf8","i5vj7pcbsu","r2ai1lye85","l452k6sppr","27v8fjzrwqb","1ypgzuv3n58","6w72f3joig","j47ecg5o4t","c4y2n9j4ak","62vuzhuodq","2adlcdvc5tf","vpto8ve7en","7s8hncrguu","1zdos9mka1m","1o0i5gy27wp","pst4hso10x","1sniojf5a5n","aw4ewbch1w","7a1ididupi","z3jcy1mhvf","1zxwiiwanv","2fop5nzeo96","q5r6p8uliw","18jw1ia8shx","o61ld290q4","20d8nywcgy","1ojh5cr8blp","1dak17iis7b","1fqbqfwywcz","axfybjukeq","a3ayshfh46","246fitz7uf","nhgo3xv9l6","718yne6k95","1vy7lrc5pnb","1acmx4zkx1p","gfqwo1hv5h","8sdkmq1zt0","1qmylpol1he","243b47ia6w5"]
+};
+const cyrb53 = (str, seed = 7) => { let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed; for (let i = 0, ch; i < str.length; i++) { ch = str.charCodeAt(i); h1 = Math.imul(h1 ^ ch, 2654435761); h2 = Math.imul(h2 ^ ch, 1597334677); } h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507); h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909); h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507); h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909); return 4294967296 * (2097151 & h2) + (h1 >>> 0); };
+const codeHash = v => cyrb53(v.toUpperCase().replace(/[^A-Z0-9]/g, "")).toString(36);
+let memUsed = "";
+const usedStore = {
+  get(){ try { return localStorage.getItem("pauseUsed") || memUsed; } catch (e) { return memUsed; } },
+  set(v){ memUsed = v; try { localStorage.setItem("pauseUsed", v); } catch (e) {} }
+};
+const PLUS_ACT = ["colors", "pairs"];
+let memPlus = "";
+const plusStore = {
+  get(){ try { return localStorage.getItem("pausePlus") || memPlus; } catch (e) { return memPlus; } },
+  set(v){ memPlus = v; try { localStorage.setItem("pausePlus", v); } catch (e) {} }
+};
+const isPlus = () => +plusStore.get() > Date.now();
+function syncPlusBtn(){ const b = $("#plusb"); b.textContent = isPlus() ? "Plus ✓" : "Plus"; b.classList.toggle("on", isPlus()); }
+
+function plusScreen(){
+  const active = isPlus();
+  const until = active ? new Date(+plusStore.get()).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) : "";
+  const wa = `https://wa.me/${PLUS.whatsapp}?text=${encodeURIComponent("Hi, I paid ₹" + PLUS.price + " for Pause Plus. Please send my access code.")}`;
+  go(`${guide("Pause Plus", active ? `It's active until ${until}. Thank you for supporting Pause.` : "A little extra calm for a small price.")}
+  <div class="panel">
+    <div class="price">₹${PLUS.price} <small>for 2 months</small></div>
+    <ul class="perks">
+      <li>Slow colours: paint with soft light</li>
+      <li>Match the pairs: a calm memory game</li>
+      <li>Pay once. No auto-renewal and no hidden charges</li>
+    </ul>
+    ${active ? "" : `
+      <p class="lab" style="margin:4px 0 6px"><b>Step 1.</b> Pay ₹${PLUS.price} to this number using Google Pay, PhonePe or Paytm:</p>
+      <div style="font-size:1.5rem;font-weight:700;letter-spacing:.04em;margin:2px 0 8px">${PLUS.phone}</div>
+      <button class="chip" id="copyno" type="button">Copy number</button>
+      ${PLUS.upiId ? `<a class="chip" href="upi://pay?pa=${encodeURIComponent(PLUS.upiId)}&pn=Pause&am=${PLUS.price}&cu=INR&tn=Pause%20Plus" style="display:inline-block;text-decoration:none;color:inherit">Open UPI app</a>` : ""}
+      <p class="lab" style="margin:6px 0 0;font-size:.82rem">Check the name shown in your UPI app before you pay.</p>
+      <p class="lab" style="margin:16px 0 8px"><b>Step 2.</b> Send your payment screenshot on WhatsApp. We'll reply with your access code.</p>
+      <a class="chip" href="${wa}" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;color:inherit">Message us on WhatsApp</a>
+      <label for="code" class="lab" style="display:block;margin-top:16px"><b>Step 3.</b> Enter your access code:</label>
+      <input class="code" id="code" autocomplete="off" autocapitalize="characters" placeholder="Enter your code">
+      <div class="msg" id="pmsg" role="status"></div>
+      <button class="btn full" id="redeem">Unlock Plus</button>`}
+    <button class="link" id="pback">Back</button>
+  </div>`);
+  $("#pback").onclick = () => S.started ? hub(false) : intro();
+  const r = $("#redeem");
+  const cp = $("#copyno");
+  if (cp) cp.onclick = () => {
+    const done = () => { cp.textContent = "Copied"; setTimeout(() => cp.textContent = "Copy number", 1800); };
+    try { navigator.clipboard.writeText(PLUS.phone).then(done, () => { cp.textContent = PLUS.phone; }); } catch (e) { cp.textContent = PLUS.phone; }
+  };
+  const redeem = () => {
+    const raw = $("#code").value.trim(), msg = $("#pmsg");
+    if (!raw) { msg.textContent = "Type the code we sent you."; return; }
+    const h = codeHash(raw), used = usedStore.get().split(",");
+    if (!PLUS.codes.includes(h)) { msg.textContent = "That code didn't work. Check it and try again, or message us on WhatsApp."; return; }
+    if (used.includes(h)) { msg.textContent = "This code was already used on this device. Message us for a new one."; return; }
+    usedStore.set(used.filter(Boolean).concat(h).join(","));
+    plusStore.set(String(Date.now() + PLUS.days * 864e5)); syncPlusBtn(); plusScreen();
+  };
+  if (r) { r.onclick = redeem; $("#code").addEventListener("keydown", e => { if (e.key === "Enter") redeem(); }); }
+}
+$("#plusb").addEventListener("click", plusScreen);
+
+/* --- events --- */
+const ACTIONS = { hub: () => hub(false), redo: () => ask(0), ask0: () => ask(0), ask1: () => ask(1), ask2: () => ask(2), breathe, pop, kind, colors, pairs };
+view.addEventListener("click", e => {
+  const el = e.target.closest("button"); if (!el) return;
+  if (el.dataset.sound) { setSound(el.dataset.sound); view.querySelectorAll("[data-sound]").forEach(b => b.setAttribute("aria-pressed", b === el)); return; }
+  if (el.dataset.q !== undefined) {
+    const n = +el.dataset.q, q = Q[n]; S[q.key] = el.dataset.v;
+    if (n === 0) setScene(S.mood);
+    if (n < 2) return ask(n + 1);
+    S.started = true; if (S.sound !== "off") Snd.start(S.mood, S.sound);
+    return hub(true);
+  }
+  const a = el.dataset.act;
+  if (a && PLUS_ACT.includes(a) && !isPlus()) return plusScreen();
+  if (a && ACTIONS[a]) ACTIONS[a]();
+});
+
+function setSound(m){
+  S.sound = m; $("#snd").value = m;
+  if (!S.started) return;
+  m === "off" ? Snd.stop() : Snd.start(S.mood, m);
+}
+$("#snd").addEventListener("change", e => setSound(e.target.value));
+$("#vol").addEventListener("input", e => Snd.setVol(e.target.value / 100));
+
+syncPlusBtn();
+intro();
+</script>
+</body>
+</html>
